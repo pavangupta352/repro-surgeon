@@ -1,0 +1,11 @@
+{
+  "id": "example-001",
+  "currency": "USD",
+  "customer": { "name": "Example customer", "delivery": "local" },
+  "items": [
+    { "sku": "sample-a", "price": 0.105, "description": "Fractional unit sample A" },
+    { "sku": "sample-b", "price": 0.105, "description": "Fractional unit sample B" },
+    { "sku": "sample-c", "price": 0.105, "description": "Fractional unit sample C" }
+  ],
+  "notes": ["Demonstration data only", "Round the aggregate to integer cents"]
+}

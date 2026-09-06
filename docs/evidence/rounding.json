@@ -1,0 +1,46 @@
+{
+  "date": "2026-09-06",
+  "kind": "seeded-example-and-ablation",
+  "runtime": {
+    "node": "v24.7.0",
+    "npm": "11.5.1",
+    "platform": "darwin",
+    "arch": "arm64",
+    "tool": "0.1.0"
+  },
+  "full": {
+    "initial": {
+      "files": 10,
+      "bytes": 3498,
+      "sourceBytes": 3173,
+      "dependencies": 0
+    },
+    "current": {
+      "files": 5,
+      "bytes": 845,
+      "sourceBytes": 520,
+      "dependencies": 0
+    },
+    "evaluations": 115,
+    "searchMs": 6561.4935829999995,
+    "verifiedRuns": 3
+  },
+  "filesOnly": {
+    "initial": {
+      "files": 10,
+      "bytes": 3498,
+      "sourceBytes": 3173,
+      "dependencies": 0
+    },
+    "current": {
+      "files": 5,
+      "bytes": 1453,
+      "sourceBytes": 1128,
+      "dependencies": 0
+    },
+    "evaluations": 20,
+    "searchMs": 1927.597042,
+    "verifiedRuns": 3
+  },
+  "limits": "One local run per setting, same source and failure check; no external competitor or independent human benchmark."
+}

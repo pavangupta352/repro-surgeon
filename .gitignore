@@ -1,0 +1,12 @@
+node_modules/
+dist/
+coverage/
+.local/
+.superpowers/
+AGENTS.md
+.DS_Store
+*.tgz
+.repro-surgeon/
+.impeccable/
+output/
+!examples/**/output/

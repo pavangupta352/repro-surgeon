@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "name": "Owned Next.js Pages Router build failure",
+  "command": ["npm", "run", "build"],
+  "oracle": {
+    "exitCode": 1,
+    "allOf": [
+      "OWNED_PAGES_TOTAL_MISMATCH: expected 12, got 13",
+      "Error occurred prerendering page \"/\""
+    ],
+    "noneOf": ["Module not found", "Cannot find module", "UNRELATED_PAGES_FAILURE", "Failed to fetch"]
+  },
+  "adapter": "auto",
+  "budget": { "maxEvaluations": 24, "maxSeconds": 600 },
+  "execution": { "timeoutMs": 120000, "installTimeoutMs": 180000, "allowInstallScripts": false },
+  "reduce": { "files": true, "syntax": true, "json": false, "dependencies": false },
+  "preserve": ["next.config.mjs"]
+}

@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "name": "Rounding regression",
+  "command": ["node", "check.mjs"],
+  "oracle": {
+    "exitCode": 1,
+    "allOf": ["AssertionError", "Line totals must round only once", "33 !== 32"],
+    "noneOf": ["ERR_MODULE_NOT_FOUND", "SyntaxError", "TypeError"]
+  },
+  "preserve": ["check.mjs"],
+  "budget": { "maxEvaluations": 200, "maxSeconds": 120 }
+}

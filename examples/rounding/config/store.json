@@ -1,0 +1,7 @@
+{
+  "title": "Example stationery shop",
+  "currency": "USD",
+  "taxRate": 0.08,
+  "shipping": { "freeAboveCents": 10000, "defaultZone": "local" },
+  "features": { "giftWrapping": true, "orderNotes": true }
+}

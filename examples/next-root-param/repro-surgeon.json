@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "name": "Next.js #97927 reconstruction",
+  "command": [
+    "npm",
+    "run",
+    "build"
+  ],
+  "oracle": {
+    "exitCode": 1,
+    "allOf": [
+      ".next/types/root-params.d.ts(4,23): error TS1005: '(' expected.",
+      ".next/types/root-params.d.ts(4,33): error TS1005: ';' expected.",
+      "Failed to type check."
+    ],
+    "noneOf": [
+      "Module not found",
+      "Cannot find module",
+      "Failed to fetch"
+    ]
+  },
+  "adapter": "next",
+  "budget": {
+    "maxEvaluations": 80,
+    "maxSeconds": 900
+  },
+  "execution": {
+    "timeoutMs": 120000,
+    "installTimeoutMs": 180000
+  },
+  "reduce": {
+    "dependencies": false
+  },
+  "preserve": [
+    "next.config.mjs"
+  ]
+}

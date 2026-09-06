@@ -1,0 +1,5 @@
+@supports (container-type: inline-size scroll-state) {
+  @container scroll-content {
+    .panel { max-width: 100cqw; }
+  }
+}

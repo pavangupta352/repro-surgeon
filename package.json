@@ -1,0 +1,29 @@
+{
+  "name": "repro-surgeon",
+  "version": "0.1.0",
+  "description": "Shrink a failing application into an independently verified reproduction.",
+  "type": "module",
+  "bin": { "repro-surgeon": "dist/cli.js" },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": { ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" } },
+  "files": ["dist", "examples", "README.md", "LICENSE", "docs"],
+  "engines": { "node": ">=22.18.0", "npm": ">=10" },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "node --test tests/*.test.ts",
+    "check": "npm run typecheck && npm test && npm run build",
+    "test:package": "node scripts/test-package.mjs",
+    "test:next": "npm run build && node scripts/validate-next.mjs",
+    "prepack": "npm run build"
+  },
+  "dependencies": { "ignore": "7.0.8", "picomatch": "4.0.7", "typescript": "5.9.3" },
+  "devDependencies": { "@types/node": "24.13.3", "@types/picomatch": "4.0.2" },
+  "license": "MIT",
+  "author": "Pavan <pavan.gupta.352@gmail.com>",
+  "repository": { "type": "git", "url": "https://github.com/pavangupta352/repro-surgeon.git" },
+  "bugs": { "url": "https://github.com/pavangupta352/repro-surgeon/issues" },
+  "homepage": "https://github.com/pavangupta352/repro-surgeon#readme",
+  "keywords": ["reproduction", "delta-debugging", "nextjs", "debugging", "test-case-reduction", "typescript"]
+}

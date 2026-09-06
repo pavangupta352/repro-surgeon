@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "name": "Next.js #96374 reconstruction",
+  "command": [
+    "npm",
+    "run",
+    "build"
+  ],
+  "oracle": {
+    "exitCode": 1,
+    "allOf": [
+      "Parsing CSS source code failed",
+      "AtKeyword(\"layer\")"
+    ],
+    "noneOf": [
+      "Module not found",
+      "Cannot find module",
+      "Failed to fetch"
+    ]
+  },
+  "adapter": "next",
+  "budget": {
+    "maxEvaluations": 80,
+    "maxSeconds": 900
+  },
+  "execution": {
+    "timeoutMs": 120000,
+    "installTimeoutMs": 180000
+  },
+  "reduce": {
+    "dependencies": false
+  },
+  "preserve": [
+    "next.config.mjs"
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "name": "repro-owned-next-pages",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": { "build": "next build" },
+  "dependencies": {
+    "next": "16.3.4",
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  }
+}
