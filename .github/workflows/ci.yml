@@ -27,6 +27,8 @@ jobs:
       - run: npm ci --ignore-scripts
       - run: npm run check
       - run: npm run test:package
+      - run: npm run build:site
+        if: matrix.os == 'ubuntu-latest' && matrix.node == '22.18.0'
   audit:
     runs-on: ubuntu-latest
     timeout-minutes: 5

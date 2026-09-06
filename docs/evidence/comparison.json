@@ -1,0 +1,208 @@
+{
+  "schemaVersion": 1,
+  "measuredAt": "2026-09-06T13:03:10.626Z",
+  "protocol": {
+    "schemaVersion": 1,
+    "frozenAt": "2026-09-06T13:03:01.862Z",
+    "fixture": "Independently authored seeded CommonJS numeric-sort example; not a third-party bug",
+    "editableFiles": [
+      "subject.cjs"
+    ],
+    "oracle": "Immutable checker exits 1 only when the three observed results exactly equal [[10,2,3],[11,12,4],[]]; other results exit 0, invalid programs and other failures exit 2",
+    "searchSeconds": 120,
+    "perOracleTimeoutSeconds": 2,
+    "finalRuns": 3,
+    "jobs": 1,
+    "order": [
+      "treereduce-javascript",
+      "Repro Surgeon"
+    ],
+    "reproSurgeonVersion": "0.2.0",
+    "treereduceVersion": "0.4.1",
+    "treereduceOrigin": "https://github.com/langston-barrett/treereduce",
+    "treereduceRegistry": "https://crates.io/crates/treereduce-javascript/0.4.1",
+    "treereduceCrateSha256": "6b0dadb6a9467ee639d1b5109e4a175e885180f89977487fe199b8d7171a330d",
+    "treereduceInstall": "cargo install treereduce-javascript --version 0.4.1 --locked",
+    "treereduceSettings": {
+      "stable": true,
+      "minReduction": 1,
+      "onParseError": "error",
+      "interestingExitCode": 1
+    },
+    "reproSurgeonSettings": {
+      "files": false,
+      "syntax": true,
+      "json": false,
+      "dependencies": false,
+      "maxEvaluations": 1000000,
+      "baselineRuns": 3,
+      "candidateRuns": 2
+    },
+    "measurement": "One measured run per tool; native oracle calls including repeated checks; fresh terminal checks timed separately. No normal export stage. Only editable source bytes count toward size.",
+    "sha256": {
+      "scripts/compare-reducers.mjs": "3df37ff7c5ec17c080d2d30bd30b96b5a0c0f006ec1a51832cc9db188edef861",
+      "examples/comparison/subject.cjs": "dc27a2d5a19b5587ec506afebff965e7d430e49198e3d239c2b626a381d23c97",
+      "examples/comparison/check.cjs": "41f8e145568095753bdc9674f827dfaa82eeedf8c41731fb81a07c89c0bdc86e",
+      "examples/comparison/package.json": "7d10cf0b8bce7e51c3c75b348a825d41d93d22173b3219511da6ee58dd365780",
+      "examples/comparison/package-lock.json": "c643d3e47ed45ed3624eb37e1d32050eb0cbab3959c5f79a9dded25f74ffd318",
+      "examples/comparison/repro-surgeon.json": "51de08aed02bccf72acd31e2ec43df0c9d1452cbcdf84d1315a21781ddf2a5de",
+      "examples/comparison/README.md": "491b597b69e41baa2997efab34f7aa08359f9ed0310e0a2719e0833fb3dfa576",
+      "dist/config.js": "d3ac57c01e2846460d8414fa2ccf1f61484a94c810560380ce7ca5b95ee27058",
+      "dist/dependencies.js": "be5fd585720fe44ae7a3ddd20ff7254467e6123eafe80d46191a62b7a6a32147",
+      "dist/engine.js": "fc7f18c51446bb41ac87856f26bae7033e370d9f822fb8f4676d0a153a110c4e",
+      "dist/graph.js": "2dc1f20950c30a7f52eb52e0e18f2ceaf34e416d943411c4762cd8c3051cad3d",
+      "dist/oracle.js": "a6cd95ce095e9eac6a181fed0143843399ad5bbaf1db188b43c7506bfd5636d8",
+      "dist/protection.js": "6b1ab323f0416761f52857a4ac4f0b08b53510d5cc2dc97784aaf80cd5447113",
+      "dist/runner.js": "d4ad42e31ce0d3ff77ae6afeeb9841b3e629fa10ed305875af752d26e72343f3",
+      "dist/snapshot.js": "9194a5b9e627b0c615b1e7193b085970e81e90dc034527dd1d937cb6f5c1400d",
+      "dist/state.js": "e41f07fb3915cb80580728ef613580b1ddf8a1db93163fc606d51408baa89964",
+      "dist/transforms.js": "db1e44e20399b1d709601eac0bf7036dfbc916dc8c7442c01a5d5ed6e8a423b2",
+      "dist/types.js": "01ae2a5b120382f9a648ced7ee8507493a134f216d100fc61600c6c9738235d2"
+    }
+  },
+  "runtime": {
+    "node": "v24.7.0",
+    "npm": "11.5.1",
+    "platform": "darwin",
+    "arch": "arm64",
+    "osRelease": "25.5.0",
+    "cpuModel": "Apple M4",
+    "logicalCpus": 10
+  },
+  "implementationHashes": {
+    "engine": "fc7f18c51446bb41ac87856f26bae7033e370d9f822fb8f4676d0a153a110c4e",
+    "transforms": "db1e44e20399b1d709601eac0bf7036dfbc916dc8c7442c01a5d5ed6e8a423b2",
+    "runner": "d4ad42e31ce0d3ff77ae6afeeb9841b3e629fa10ed305875af752d26e72343f3",
+    "oracle": "a6cd95ce095e9eac6a181fed0143843399ad5bbaf1db188b43c7506bfd5636d8",
+    "dependencies": "be5fd585720fe44ae7a3ddd20ff7254467e6123eafe80d46191a62b7a6a32147",
+    "snapshot": "9194a5b9e627b0c615b1e7193b085970e81e90dc034527dd1d937cb6f5c1400d"
+  },
+  "originalBytes": 938,
+  "controls": [
+    {
+      "label": "original",
+      "exitCode": 1,
+      "oracle": "reproduced",
+      "timedOut": false,
+      "aborted": false,
+      "diagnostics": [
+        "COMPARISON_NUMERIC_SORT: observed [[10,2,3],[11,12,4],[]]"
+      ]
+    },
+    {
+      "label": "fixed-numeric-comparator",
+      "exitCode": 0,
+      "oracle": "absent",
+      "timedOut": false,
+      "aborted": false,
+      "diagnostics": [
+        "COMPARISON_TARGET_ABSENT"
+      ]
+    },
+    {
+      "label": "different-failure",
+      "exitCode": 2,
+      "oracle": "absent",
+      "timedOut": false,
+      "aborted": false,
+      "diagnostics": [
+        "COMPARISON_OTHER_FAILURE"
+      ]
+    },
+    {
+      "label": "syntax-error",
+      "exitCode": 2,
+      "oracle": "absent",
+      "timedOut": false,
+      "aborted": false,
+      "diagnostics": [
+        "COMPARISON_OTHER_FAILURE"
+      ]
+    }
+  ],
+  "results": [
+    {
+      "tool": "treereduce-javascript",
+      "version": "0.4.1",
+      "searchMs": 2955.568625,
+      "processExitCode": 0,
+      "budgetExpired": false,
+      "usedOriginalAfterDeadline": false,
+      "stop": "stable search completed",
+      "queries": {
+        "calls": 120,
+        "uniqueSubjectHashes": 82,
+        "target": 10,
+        "absent": 12,
+        "other": 98
+      },
+      "reducedBytes": 334,
+      "sha256": "3707b7f25cd1e2029561baccfe8bfabfd543b48390227e76da71df3ecc290326",
+      "reducedSource": "\n\n\n\n\n\nfunction normalizeScores(scores) {\n  return scores.map(Number).filter(Number.isFinite);\n}\n\nfunction sortScores(scores) {\n  const numeric = normalizeScores(scores);\n  return numeric.sort();\n}\n\nfunction scoreSummary() {\n  \n  \n  \n}\n\nfunction formatReport() {\n  \n  \n}\n\nmodule.exports = { sortScores, scoreSummary, formatReport,  };\n",
+      "finalVerification": {
+        "runs": [
+          {
+            "exitCode": 1,
+            "oracle": "reproduced"
+          },
+          {
+            "exitCode": 1,
+            "oracle": "reproduced"
+          },
+          {
+            "exitCode": 1,
+            "oracle": "reproduced"
+          }
+        ],
+        "elapsedMs": 700.5920830000005,
+        "freshInstallationPerRun": true
+      }
+    },
+    {
+      "tool": "Repro Surgeon",
+      "version": "0.2.0",
+      "searchMs": 4079.862,
+      "engineRecordedMs": 3966.120166999999,
+      "budgetExpired": false,
+      "stop": "No further reduction found by the enabled passes",
+      "candidateEvaluations": 92,
+      "baselineCalls": 3,
+      "acceptedTrials": 15,
+      "queries": {
+        "calls": 95,
+        "uniqueSubjectHashes": 78,
+        "target": 33,
+        "absent": 11,
+        "other": 51
+      },
+      "reducedBytes": 248,
+      "sha256": "972dae1de94c1da33be0dbc8657926556c2d649df6cc4af673afacc0379275cc",
+      "reducedSource": "'use strict';\n\n\n\n\n\nfunction normalizeScores(scores) {\n  return scores.map(Number).filter(Number.isFinite);\n}\n\nfunction sortScores(scores) {\n  const numeric = normalizeScores(scores);\n  return numeric.sort();\n}\n\n\n\n\n\nmodule.exports = { sortScores };\n",
+      "finalVerification": {
+        "runs": [
+          {
+            "exitCode": 1,
+            "oracle": "reproduced"
+          },
+          {
+            "exitCode": 1,
+            "oracle": "reproduced"
+          },
+          {
+            "exitCode": 1,
+            "oracle": "reproduced"
+          }
+        ],
+        "elapsedMs": 529.5023339999989,
+        "freshInstallationPerRun": true
+      }
+    }
+  ],
+  "limitations": [
+    "One seeded, independently authored single-file fixture; one measured run per tool, treereduce first.",
+    "Same editable subject and precise property, different native transformation sets and repeated-check policies.",
+    "Repro Surgeon includes three baseline runs and two confirmations per accepted candidate; treereduce uses its native checks. Query counts include all native checks during search.",
+    "Search times are end-to-end observed tool calls under equal 120-second ceilings. Separate common fresh checks are reported separately; normal Repro Surgeon export generation is not timed.",
+    "No whole-application, typical-case, independent-maintainer, or general superiority claim."
+  ]
+}

@@ -1,0 +1,48 @@
+import assert from 'node:assert/strict';
+import { spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
+import { cp, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { loadConfig } from '../dist/config.js';
+import { inventoryProject } from '../dist/snapshot.js';
+
+const project = fileURLToPath(new URL('..', import.meta.url));
+const temporary = await mkdtemp(path.join(tmpdir(), 'repro-surgeon-site-'));
+const output = path.join(project, 'site', 'dist');
+const runRoot = path.join(temporary, 'run');
+try {
+  const result = spawnSync(process.execPath, [path.join(project, 'dist', 'cli.js'), 'demo', '--out', runRoot, '--json'], { cwd: temporary, encoding: 'utf8', timeout: 180000, maxBuffer: 4 * 1024 * 1024 });
+  assert.equal(result.status, 0, `Public demo build failed:\n${result.stderr}`);
+  const report = JSON.parse(result.stdout);
+  assert.equal(report.verification.status, 'verified');
+  assert.equal(report.verification.runs, 3);
+  assert.equal(report.baseline.completed, 3);
+  const source = path.join(project, 'examples', 'rounding');
+  const config = await loadConfig(path.join(source, 'repro-surgeon.json'));
+  const { snapshot } = await inventoryProject(source, config);
+  const baseline = JSON.parse(await readFile(path.join(runRoot, 'logs', '000000-baseline.json'), 'utf8'));
+  assert.equal(baseline.oracle.status, 'reproduced');
+  const assertion = baseline.execution.stderr.match(/AssertionError[^\n]*: Line totals must round only once/);
+  assert(assertion && baseline.execution.stderr.includes('33 !== 32'));
+  const recording = { tool: report.runtime.tool, node: report.runtime.node, createdAt: report.createdAt, initial: report.initial, final: report.current, baseline: report.baseline, verification: report.verification, evaluations: report.evaluations, originalFiles: [...snapshot.keys()].sort(), accepted: report.trials.filter(trial => trial.accepted).map(({ index, kind, description, paths, before, after, confirmations }) => ({ index, kind, description, paths, before, after, confirmations })), failureExcerpt: `${assertion[0]}\n\n33 !== 32` };
+  assert(recording.accepted.length > 0);
+  const serialized = JSON.stringify(recording);
+  const html = await readFile(path.join(runRoot, 'report.html'), 'utf8');
+  for (const content of [serialized, html]) assert(!/\/Users\/|\/home\/|LIFECYCLE_PRIVATE|BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY/.test(content), 'Public demo contains private material');
+  await rm(output, { recursive: true, force: true });
+  await mkdir(output, { recursive: true });
+  for (const filename of ['index.html', 'style.css', 'app.js']) await cp(path.join(project, 'site', filename), path.join(output, filename));
+  await writeFile(path.join(output, 'recording.js'), `window.REPRO_RECORDING = ${serialized.replaceAll('<', '\\u003c')};\n`);
+  await writeFile(path.join(output, 'recording.json'), JSON.stringify(recording, null, 2) + '\n');
+  await writeFile(path.join(output, 'report.html'), html);
+  await writeFile(path.join(output, 'report.json'), JSON.stringify(report, null, 2) + '\n');
+  await cp(path.join(runRoot, 'repro'), path.join(temporary, 'rounding-repro'), { recursive: true });
+  const archive = path.join(output, 'rounding-repro.tar.gz');
+  const packed = spawnSync('tar', ['--no-xattrs', '-czf', archive, '-C', temporary, 'rounding-repro'], { encoding: 'utf8', env: { ...process.env, COPYFILE_DISABLE: '1' } });
+  assert.equal(packed.status, 0, packed.stderr);
+  await writeFile(path.join(output, 'SHA256SUMS'), createHash('sha256').update(await readFile(archive)).digest('hex') + '  rounding-repro.tar.gz\n');
+  await writeFile(path.join(output, '.nojekyll'), '');
+  console.log(JSON.stringify({ version: report.runtime.tool, output, files: report.current.files, sourceBytes: report.current.sourceBytes, freshChecks: report.verification.runs }, null, 2));
+} finally { await rm(temporary, { recursive: true, force: true }); }

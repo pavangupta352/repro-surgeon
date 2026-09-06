@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "frozenAt": "2026-09-06T13:03:01.862Z",
+  "fixture": "Independently authored seeded CommonJS numeric-sort example; not a third-party bug",
+  "editableFiles": [
+    "subject.cjs"
+  ],
+  "oracle": "Immutable checker exits 1 only when the three observed results exactly equal [[10,2,3],[11,12,4],[]]; other results exit 0, invalid programs and other failures exit 2",
+  "searchSeconds": 120,
+  "perOracleTimeoutSeconds": 2,
+  "finalRuns": 3,
+  "jobs": 1,
+  "order": [
+    "treereduce-javascript",
+    "Repro Surgeon"
+  ],
+  "reproSurgeonVersion": "0.2.0",
+  "treereduceVersion": "0.4.1",
+  "treereduceOrigin": "https://github.com/langston-barrett/treereduce",
+  "treereduceRegistry": "https://crates.io/crates/treereduce-javascript/0.4.1",
+  "treereduceCrateSha256": "6b0dadb6a9467ee639d1b5109e4a175e885180f89977487fe199b8d7171a330d",
+  "treereduceInstall": "cargo install treereduce-javascript --version 0.4.1 --locked",
+  "treereduceSettings": {
+    "stable": true,
+    "minReduction": 1,
+    "onParseError": "error",
+    "interestingExitCode": 1
+  },
+  "reproSurgeonSettings": {
+    "files": false,
+    "syntax": true,
+    "json": false,
+    "dependencies": false,
+    "maxEvaluations": 1000000,
+    "baselineRuns": 3,
+    "candidateRuns": 2
+  },
+  "measurement": "One measured run per tool; native oracle calls including repeated checks; fresh terminal checks timed separately. No normal export stage. Only editable source bytes count toward size.",
+  "sha256": {
+    "scripts/compare-reducers.mjs": "3df37ff7c5ec17c080d2d30bd30b96b5a0c0f006ec1a51832cc9db188edef861",
+    "examples/comparison/subject.cjs": "dc27a2d5a19b5587ec506afebff965e7d430e49198e3d239c2b626a381d23c97",
+    "examples/comparison/check.cjs": "41f8e145568095753bdc9674f827dfaa82eeedf8c41731fb81a07c89c0bdc86e",
+    "examples/comparison/package.json": "7d10cf0b8bce7e51c3c75b348a825d41d93d22173b3219511da6ee58dd365780",
+    "examples/comparison/package-lock.json": "c643d3e47ed45ed3624eb37e1d32050eb0cbab3959c5f79a9dded25f74ffd318",
+    "examples/comparison/repro-surgeon.json": "51de08aed02bccf72acd31e2ec43df0c9d1452cbcdf84d1315a21781ddf2a5de",
+    "examples/comparison/README.md": "491b597b69e41baa2997efab34f7aa08359f9ed0310e0a2719e0833fb3dfa576",
+    "dist/config.js": "d3ac57c01e2846460d8414fa2ccf1f61484a94c810560380ce7ca5b95ee27058",
+    "dist/dependencies.js": "be5fd585720fe44ae7a3ddd20ff7254467e6123eafe80d46191a62b7a6a32147",
+    "dist/engine.js": "fc7f18c51446bb41ac87856f26bae7033e370d9f822fb8f4676d0a153a110c4e",
+    "dist/graph.js": "2dc1f20950c30a7f52eb52e0e18f2ceaf34e416d943411c4762cd8c3051cad3d",
+    "dist/oracle.js": "a6cd95ce095e9eac6a181fed0143843399ad5bbaf1db188b43c7506bfd5636d8",
+    "dist/protection.js": "6b1ab323f0416761f52857a4ac4f0b08b53510d5cc2dc97784aaf80cd5447113",
+    "dist/runner.js": "d4ad42e31ce0d3ff77ae6afeeb9841b3e629fa10ed305875af752d26e72343f3",
+    "dist/snapshot.js": "9194a5b9e627b0c615b1e7193b085970e81e90dc034527dd1d937cb6f5c1400d",
+    "dist/state.js": "e41f07fb3915cb80580728ef613580b1ddf8a1db93163fc606d51408baa89964",
+    "dist/transforms.js": "db1e44e20399b1d709601eac0bf7036dfbc916dc8c7442c01a5d5ed6e8a423b2",
+    "dist/types.js": "01ae2a5b120382f9a648ced7ee8507493a134f216d100fc61600c6c9738235d2"
+  }
+}

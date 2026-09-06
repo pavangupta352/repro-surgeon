@@ -195,5 +195,6 @@ export async function runtimeInfo(cwd: string, signal?: AbortSignal): Promise<Ru
   if (result.exitCode !== 0 || result.error || result.timedOut) throw new Error('npm could not be started. Install npm 10 or newer.');
   const npm = result.stdout.trim();
   if (Number(npm.split('.')[0]) < 10) throw new Error('npm 10 or newer is required.');
-  return { node: process.version, npm, platform: process.platform, arch: process.arch, tool: '0.1.0' };
+  const { version } = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8')) as { version: string };
+  return { node: process.version, npm, platform: process.platform, arch: process.arch, tool: version };
 }

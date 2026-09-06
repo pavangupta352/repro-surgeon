@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { parseArgs, stripVTControlCharacters } from 'node:util';
 import { loadConfig, parseConfig } from './config.ts';
 import { runtimeInfo, validateNpmProject } from './dependencies.ts';
@@ -15,6 +16,7 @@ import type { Config, RunReport, RunState, Snapshot } from './types.ts';
 const help = `Repro Surgeon · smaller source, the failure intact
 
 Usage
+  repro-surgeon demo [--out <run-directory>] [--json]
   repro-surgeon init [project] --match "distinctive diagnostic" -- <command> [args]
   repro-surgeon doctor [project] [--json]
   repro-surgeon reduce [project] --out <run-directory> [--config <file>]
@@ -35,6 +37,7 @@ Options
   --version, -v             Show the installed version
 
 Single-package npm projects · Node 22.18+ · Linux/macOS
+Demo uses the bundled rounding example and saves a timestamped run in the current directory.
 Commands execute locally with your permissions. Review remaining source before sharing.
 `;
 
@@ -55,6 +58,25 @@ export function createRunReport(state: RunState, snapshot: Snapshot): RunReport 
 
 function terminal(message: string): void { process.stderr.write(stripVTControlCharacters(message) + '\n'); }
 
+async function installedVersion(): Promise<string> {
+  try {
+    const metadata: unknown = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8'));
+    if (metadata && typeof metadata === 'object' && 'version' in metadata && typeof metadata.version === 'string' && metadata.version.trim()) return metadata.version;
+  } catch { /* Report the same actionable error for missing or invalid metadata. */ }
+  throw new Error('The installed package version could not be read. Reinstall repro-surgeon or restore its package.json.');
+}
+
+async function bundledDemo(): Promise<{ sourceRoot: string; config: Config }> {
+  const sourceRoot = fileURLToPath(new URL('../examples/rounding/', import.meta.url));
+  try {
+    const config = await loadConfig(path.join(sourceRoot, 'repro-surgeon.json'));
+    await Promise.all(['package.json', 'package-lock.json', 'check.mjs', 'src/totals.mjs', 'fixtures/invoice.json'].map(name => readFile(path.join(sourceRoot, name))));
+    return { sourceRoot, config };
+  } catch {
+    throw new Error('The bundled rounding demo could not be loaded. Reinstall repro-surgeon or restore examples/rounding in a complete source checkout.');
+  }
+}
+
 async function main(args: string[]): Promise<number> {
   const separator = args.indexOf('--');
   const invocation = separator < 0 ? [] : args.slice(separator + 1);
@@ -64,8 +86,11 @@ async function main(args: string[]): Promise<number> {
     config: { type: 'string' }, out: { type: 'string' }, 'max-evaluations': { type: 'string' }, 'max-seconds': { type: 'string' },
   } });
   if (values.help || args.length === 0) { process.stdout.write(help); return 0; }
-  if (values.version) { process.stdout.write('0.1.0\n'); return 0; }
+  if (values.version) { process.stdout.write(await installedVersion() + '\n'); return 0; }
   const [command, target, ...extra] = positionals;
+  if (command === 'demo' && (target !== undefined || values.config !== undefined || values.match !== undefined || values.forbid !== undefined || values.exit !== undefined)) {
+    throw new Error('demo uses the bundled project and failure configuration. Use reduce for your own project or configuration; demo accepts --out, --json, --max-evaluations and --max-seconds.');
+  }
   if (extra.length) throw new Error('Too many positional arguments. See --help.');
   if (process.platform === 'win32') throw new Error('Windows execution is not validated yet. Use Linux or macOS.');
   const directory = path.resolve(target ?? process.cwd());
@@ -112,17 +137,17 @@ async function main(args: string[]): Promise<number> {
       print(report, `Report: ${path.join(directory, 'report.html')}`);
       return 0;
     }
-    if (command !== 'reduce' && command !== 'resume') throw new Error(`Unknown command: ${command ?? '(none)'}. See --help.`);
+    if (command !== 'reduce' && command !== 'resume' && command !== 'demo') throw new Error(`Unknown command: ${command ?? '(none)'}. See --help.`);
     if (command === 'resume' && !target) throw new Error('resume requires a run directory.');
     const onEvent = (event: { message: string }) => terminal(event.message);
     let result;
     let runRoot: string;
-    if (command === 'reduce') {
-      const config = await loadConfig(path.resolve(values.config ?? path.join(directory, 'repro-surgeon.json')));
+    if (command === 'reduce' || command === 'demo') {
+      const { sourceRoot, config } = command === 'demo' ? await bundledDemo() : { sourceRoot: directory, config: await loadConfig(path.resolve(values.config ?? path.join(directory, 'repro-surgeon.json'))) };
       if (values['max-evaluations'] !== undefined) config.budget.maxEvaluations = Number(values['max-evaluations']);
       if (values['max-seconds'] !== undefined) config.budget.maxSeconds = Number(values['max-seconds']);
-      runRoot = path.resolve(values.out ?? path.join(path.dirname(directory), `${path.basename(directory)}-repro-${Date.now()}`));
-      result = await reduceProject({ sourceRoot: directory, runRoot, config, signal: controller.signal, onEvent });
+      runRoot = path.resolve(values.out ?? (command === 'demo' ? path.join(process.cwd(), `repro-surgeon-demo-${Date.now()}`) : path.join(path.dirname(directory), `${path.basename(directory)}-repro-${Date.now()}`)));
+      result = await reduceProject({ sourceRoot, runRoot, config, signal: controller.signal, onEvent });
     } else {
       runRoot = directory;
       result = await resumeProject({ runRoot, signal: controller.signal, onEvent, ...(values['max-evaluations'] === undefined ? {} : { maxEvaluations: Number(values['max-evaluations']) }), ...(values['max-seconds'] === undefined ? {} : { maxSeconds: Number(values['max-seconds']) }) });

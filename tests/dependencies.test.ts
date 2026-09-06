@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdtemp, mkdir, readdir, rm, readFile, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { validateNpmProject, dependencyCandidates, assertLockIntegrity, createIsolatedDirectory, WorkspaceManager } from '../src/dependencies.ts';
+import { validateNpmProject, dependencyCandidates, assertLockIntegrity, createIsolatedDirectory, WorkspaceManager, runtimeInfo } from '../src/dependencies.ts';
 import { applyTransformation, snapshotHash } from '../src/snapshot.ts';
 import { runCommand } from '../src/runner.ts';
 import type { Config, Snapshot } from '../src/types.ts';
@@ -11,6 +11,11 @@ import type { Config, Snapshot } from '../src/types.ts';
 function project(pkg: object = { name: 'case', version: '1.0.0' }, lock: object = { name: 'case', lockfileVersion: 3, packages: { '': { name: 'case', version: '1.0.0' } } }): Snapshot {
   return new Map([['package.json', { content: Buffer.from(JSON.stringify(pkg)), mode: 0o644 }], ['package-lock.json', { content: Buffer.from(JSON.stringify(lock)), mode: 0o644 }]]);
 }
+
+test('checkpoint runtime identity matches the installed package version', async () => {
+  const metadata = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8'));
+  assert.equal((await runtimeInfo()).tool, metadata.version);
+});
 
 test('npm validation rejects unpinned, workspace and local dependencies before executing anything', () => {
   assert.doesNotThrow(() => validateNpmProject(project()));

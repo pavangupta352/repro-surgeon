@@ -3,6 +3,7 @@
 **Shrink the project. Keep the failure. Hand over something runnable.**
 
 [![CI](https://github.com/pavangupta352/repro-surgeon/actions/workflows/ci.yml/badge.svg)](https://github.com/pavangupta352/repro-surgeon/actions/workflows/ci.yml)
+[![npm version](https://img.shields.io/npm/v/repro-surgeon?color=006a62)](https://www.npmjs.com/package/repro-surgeon)
 [![License: MIT](https://img.shields.io/badge/license-MIT-006a62)](LICENSE)
 
 “Can you provide a minimal reproduction?” is often the hardest part of a bug report.
@@ -11,33 +12,30 @@ Repro Surgeon takes a failing npm application, removes source that isn't needed 
 
 No account. No telemetry. Source and reports stay local.
 
-![An actual rounding example reduced from 10 files to 5, with three independent verification runs](docs/assets/report.png)
+[![An actual rounding example reduced from 10 files to 5, with three independent verification runs](https://raw.githubusercontent.com/pavangupta352/repro-surgeon/main/docs/assets/report.png)](https://pavangupta352.github.io/repro-surgeon/)
 
-*Actual bundled demonstration: 3,173 → 520 source bytes, 10 → 5 files, 115 evaluations. The assertion remains pinned. This is a small seeded example, not a framework benchmark. [Method and evidence](docs/validation.md).*
+*Actual bundled demonstration: 3,173 → 520 source bytes, 10 → 5 files, 115 evaluations. The assertion remains pinned. This is a small seeded example, not a framework benchmark. [Replay the run and download its verified result](https://pavangupta352.github.io/repro-surgeon/) · [Method and evidence](docs/validation.md).*
 
 ## Try it
 
 Requires **Node.js 22.18+ and npm 10+**, on Linux or macOS.
 
 ```sh
-git clone https://github.com/pavangupta352/repro-surgeon.git
-cd repro-surgeon
-npm ci
-npm run build
-
-node dist/cli.js reduce examples/rounding --out /tmp/rounding-repro
-node /tmp/rounding-repro/repro/.repro/verify.mjs
+npx repro-surgeon@0.2.0 demo --out ./rounding-repro
+node ./rounding-repro/repro/.repro/verify.mjs
 ```
 
-Choose a new output directory for each run. Open `/tmp/rounding-repro/report.html` to inspect the result. The verifier exits successfully when the application's **expected failure** occurs; the original application command still exits with its configured failure code.
+No clone or configuration needed. The first command reduces the bundled example, generates an offline report and verifies the export three times. The second runs the exported verifier independently.
+
+Choose a new output directory for each run. Open `./rounding-repro/report.html` to inspect the result. The verifier exits successfully when the application's **expected failure** occurs; the original application command still exits with its configured failure code. You can also [explore the recorded walkthrough in your browser](https://pavangupta352.github.io/repro-surgeon/) before installing anything.
 
 Install the packaged release for your own projects:
 
 ```sh
-npm install --global repro-surgeon@0.1.0
+npm install --global repro-surgeon@0.2.0
 ```
 
-The same package is available from the [versioned GitHub release](https://github.com/pavangupta352/repro-surgeon/releases/tag/v0.1.0), with a checksum. You can also run `npx repro-surgeon@0.1.0 --help`.
+The same package is available from the [versioned GitHub release](https://github.com/pavangupta352/repro-surgeon/releases/tag/v0.2.0), with a checksum. You can also run `npx repro-surgeon@0.2.0 --help`.
 
 ## Reduce your application
 
@@ -82,8 +80,8 @@ my-app-repro/
 │       ├── README.md       # Runtime, command and verification instructions
 │       ├── config.json
 │       ├── LICENSE         # License for the generated verifier code
-│       ├── manifest.json  # Source and metadata integrity records
-│       └── verify.mjs     # Runs without Repro Surgeon installed
+│       ├── manifest.json   # Source and metadata integrity records
+│       └── verify.mjs      # Runs without Repro Surgeon installed
 ├── report.html             # Offline, searchable evidence
 ├── report.json             # Machine-readable report
 └── … private run state     # Original snapshots and raw logs; keep private
@@ -132,12 +130,15 @@ Commands execute with your host permissions. This is **not a security sandbox**.
 
 ## Run the checks
 
-From the repository root:
+To develop from source:
 
 ```sh
+git clone https://github.com/pavangupta352/repro-surgeon.git
+cd repro-surgeon
 npm ci
 npm run check
 npm run test:package
+node dist/cli.js demo --out /tmp/rounding-repro
 ```
 
 The native suite does not fetch framework fixture dependencies. Run these optional integrations separately; they download public pinned packages and the Next.js checks take several minutes:
@@ -153,6 +154,8 @@ Choose new output directories. The scripts check fixed and different-error contr
 ## Related work and contributions
 
 This builds on [delta debugging](https://www.st.cs.uni-saarland.de/papers/tse2002/) and shares the goal of property-preserving reduction with [treereduce](https://github.com/langston-barrett/treereduce). [Replay](https://www.replay.io/debugging) addresses recorded execution. Repro Surgeon focuses on the path from an application source tree to an independently installable, verified reproduction. No comparative superiority is claimed.
+
+A frozen single-file comparison against treereduce is [published with inputs, controls and query counts](docs/comparison.md). From the same 938-byte authored example, treereduce produced 334 bytes in 2.956 seconds and Repro Surgeon produced 248 bytes in 4.080 seconds. Both passed three fresh checks. That mixed result describes this fixture only; it is not a full-application benchmark.
 
 Have a failure this cannot reduce reliably? A small licensed case with a precise failure check is especially useful. Read [CONTRIBUTING.md](CONTRIBUTING.md), open an [issue](https://github.com/pavangupta352/repro-surgeon/issues), or improve a reducer with a regression test.
 

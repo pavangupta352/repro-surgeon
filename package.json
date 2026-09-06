@@ -1,6 +1,6 @@
 {
   "name": "repro-surgeon",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Shrink a failing application into an independently verified reproduction.",
   "type": "module",
   "bin": { "repro-surgeon": "dist/cli.js" },
@@ -11,6 +11,7 @@
   "engines": { "node": ">=22.18.0", "npm": ">=10" },
   "scripts": {
     "build": "tsc -p tsconfig.json",
+    "build:site": "npm run build && node scripts/build-site.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "node --test tests/*.test.ts",
     "check": "npm run typecheck && npm test && npm run build",
@@ -24,6 +25,6 @@
   "author": "Pavan <pavan.gupta.352@gmail.com>",
   "repository": { "type": "git", "url": "https://github.com/pavangupta352/repro-surgeon.git" },
   "bugs": { "url": "https://github.com/pavangupta352/repro-surgeon/issues" },
-  "homepage": "https://github.com/pavangupta352/repro-surgeon#readme",
+  "homepage": "https://pavangupta352.github.io/repro-surgeon/",
   "keywords": ["reproduction", "delta-debugging", "nextjs", "debugging", "test-case-reduction", "typescript"]
 }

@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Watch Repro Surgeon shrink a failing npm application, then inspect and download the independently verified reproduction.">
+  <meta property="og:title" content="Repro Surgeon — keep the failure, shrink the project">
+  <meta property="og:description" content="Replay a real reduction, inspect its evidence, and download the verified reproduction. Local, open source, MIT licensed.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://pavangupta352.github.io/repro-surgeon/">
+  <meta property="og:image" content="https://raw.githubusercontent.com/pavangupta352/repro-surgeon/main/docs/assets/report.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <title>Repro Surgeon — keep the failure, shrink the project</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="style.css">
+  <script src="recording.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#walkthrough">Skip to the walkthrough</a>
+  <header class="masthead">
+    <a class="wordmark" href="./">Repro Surgeon</a>
+    <nav aria-label="Project"><a href="https://github.com/pavangupta352/repro-surgeon">GitHub</a><a href="https://www.npmjs.com/package/repro-surgeon">npm</a><a href="https://github.com/pavangupta352/repro-surgeon/blob/main/docs/validation.md">Validation</a></nav>
+  </header>
+  <main>
+    <section class="intro" aria-labelledby="title">
+      <h1 id="title">Keep the failure.<br>Shrink the project.</h1>
+      <p>A bug report needs something another developer can run. Repro Surgeon tests smaller versions of a failing npm app, then exports a project with its own verifier.</p>
+    </section>
+    <section class="walkthrough" id="walkthrough" aria-labelledby="walkthrough-title">
+      <div class="section-heading"><div><h2 id="walkthrough-title">Follow a real reduction</h2><p>A recorded run of the bundled rounding example. No code is uploaded or executed in this page.</p></div><button class="primary" id="play" type="button" disabled>Replay recorded run</button></div>
+      <div class="stages" aria-label="Walkthrough stages">
+        <button type="button" data-stage="failure" aria-pressed="true"><span class="stage-number">1</span> Observe the failure</button>
+        <button type="button" data-stage="reduction" aria-pressed="false"><span class="stage-number">2</span> Remove what can go</button>
+        <button type="button" data-stage="verification" aria-pressed="false"><span class="stage-number">3</span> Verify the export</button>
+      </div>
+      <div class="evidence">
+        <div class="observation"><div class="observation-heading"><h3 id="stage-title">The application fails</h3><span class="status" id="status">Expected failure</span></div><p id="stage-detail">The check catches a rounding error: line totals must round only once.</p><pre id="terminal" tabindex="0" aria-label="Recorded command output"><code>Loading the recorded evidence…</code></pre><p class="caption" id="terminal-caption">Actual baseline output excerpt.</p></div>
+        <div class="source"><div class="source-heading"><h3>Source remaining</h3><span id="file-count">—</span></div><div class="source-measure"><strong id="source-bytes">—</strong><span>source bytes</span><span id="reduction-amount"></span></div><ul id="file-tree" tabindex="0" aria-label="Files in this stage"></ul></div>
+      </div>
+      <div class="record-footer"><p id="playback-status" role="status" aria-live="polite">Loading recording.</p><a href="report.html">Inspect the full interactive report <span aria-hidden="true">→</span></a></div>
+      <noscript><p class="noscript">The walkthrough needs JavaScript. The <a href="report.html">complete recorded report</a> and <a href="rounding-repro.tar.gz">verified source download</a> remain available.</p></noscript>
+    </section>
+    <section class="try-it" aria-labelledby="try-title">
+      <div><h2 id="try-title">Run it yourself</h2><p>One command runs the real example, reduction, and fresh verification. Requires Node 22.18+ and npm 10+ on Linux or macOS.</p></div>
+      <div class="command-group"><div class="command"><code id="demo-command">npx repro-surgeon demo --out ./rounding-repro</code><button id="copy" type="button" disabled>Copy command</button></div><p id="copy-status" role="status">Choose a new output directory. Open its report.html when the command finishes.</p></div>
+    </section>
+    <section class="take-away" aria-labelledby="export-title">
+      <h2 id="export-title">Take the reproduction with you</h2>
+      <div class="export-grid"><div><p>The recorded export includes the reduced application, a locked dependency manifest, an integrity record, and a verifier that runs without Repro Surgeon installed.</p><a class="download" href="rounding-repro.tar.gz" download>Download the verified example</a><a class="checksum" href="SHA256SUMS">SHA-256 checksum</a></div><pre tabindex="0" aria-label="Verify the downloaded example"><code>tar -xzf rounding-repro.tar.gz
+cd rounding-repro
+node .repro/verify.mjs</code></pre></div>
+      <p class="method">This is an authored demonstration, not a general benchmark. Every accepted change had two matching executions; the baseline and export each had three. The verifier succeeds when the application's expected failure occurs.</p>
+    </section>
+  </main>
+  <footer><p>Local execution. No telemetry. MIT licensed.</p><p><a href="https://github.com/pavangupta352/repro-surgeon#reduce-your-application">Use it on your application</a><a href="https://github.com/pavangupta352/repro-surgeon/issues">Report a problem</a><a href="https://github.com/pavangupta352">Pavan</a></p></footer>
+</body>
+</html>

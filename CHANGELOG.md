@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.0
+
+- Run the bundled rounding demonstration directly from the installed package with `repro-surgeon demo`. It reduces the source, exports a reproduction and verifies it independently.
+- Explore a public walkthrough built from actual reduction evidence, with a downloadable reproduction, checksum and offline report.
+- Compare the syntax pass with treereduce on one frozen, independently authored fixture. Both preserve the failure; the documented size and timing results are deliberately scoped to that case.
+- Read the tool version from package metadata so checkpoint and report identities stay correct across releases.
+- Test the installed demo, immutable bundled source, standalone verifier and public demo build in CI.
+
 ## 0.1.0
 
 Initial public release of the complete local application-reduction workflow.

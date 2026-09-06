@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "name": "Single-file numeric-sort comparison",
+  "command": ["node", "check.cjs"],
+  "oracle": {
+    "exitCode": 1,
+    "allOf": ["COMPARISON_NUMERIC_SORT: observed [[10,2,3],[11,12,4],[]]"],
+    "noneOf": ["COMPARISON_OTHER_FAILURE", "COMPARISON_TARGET_ABSENT"]
+  },
+  "adapter": "generic",
+  "preserve": ["check.cjs", "package.json", "package-lock.json", "repro-surgeon.json", "README.md", "freeze.json"],
+  "reduce": { "files": false, "syntax": true, "json": false, "dependencies": false },
+  "budget": { "maxEvaluations": 1000000, "maxSeconds": 120 },
+  "execution": { "timeoutMs": 2000, "maxOutputBytes": 65536, "env": ["COMPARISON_LOG"] }
+}
