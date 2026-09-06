@@ -24,6 +24,23 @@ async function fixture(t: test.TestContext) {
   return { base, source, config };
 }
 
+async function controlledNpm(t: test.TestContext, base: string, installSource = ''): Promise<void> {
+  const bin = path.join(base, 'bin');
+  await mkdir(bin);
+  await writeFile(path.join(bin, 'npm'), `#!${process.execPath}\nif (process.argv.includes('--version')) console.log('11.5.1');\nelse { ${installSource} }\n`, { mode: 0o755 });
+  const previousPath = process.env.PATH;
+  process.env.PATH = bin + path.delimiter + (previousPath ?? '');
+  t.after(() => { process.env.PATH = previousPath; });
+}
+
+function cancellableProgram(events: string): string {
+  return `const fs = require('node:fs');
+const record = event => fs.appendFileSync(${JSON.stringify(events)}, event + '\\n');
+process.on('SIGTERM', () => { record('cancelled'); process.exit(0); });
+record('started');
+setTimeout(() => { record('completed'); process.exit(0); }, 3000);`;
+}
+
 test('complete reduction removes interdependent irrelevant files while retaining original target and source integrity', async t => {
   const { base, source, config } = await fixture(t);
   const notices = ['LICENSE-MIT', 'LICENSE-APACHE', 'THIRD_PARTY_NOTICES.txt'];
@@ -63,13 +80,18 @@ test('interruption checkpoints the last accepted state and resume can complete w
 
 test('the run deadline interrupts slow baseline execution and saves an unmodified paused snapshot', async t => {
   const { base, source, config } = await fixture(t);
-  config.command = [process.execPath, '-e', "setTimeout(() => { console.error('TARGET_RANGE_MISMATCH: expected 7, got 8'); process.exit(1); }, 3000)"];
+  const events = path.join(base, 'baseline-events');
+  await controlledNpm(t, base);
+  config.command = [process.execPath, '-e', cancellableProgram(events)];
   config.budget.maxSeconds = 1;
   config.execution.timeoutMs = 10000;
   const original = snapshotHash((await inventoryProject(source, config)).snapshot);
-  const started = Date.now();
-  const result = await reduceProject({ sourceRoot: source, runRoot: path.join(base, 'deadline'), config });
-  assert(Date.now() - started < 2300, 'baseline used the longer command timeout');
+  const runRoot = path.join(base, 'deadline');
+  const result = await reduceProject({ sourceRoot: source, runRoot, config });
+  assert.equal(await readFile(events, 'utf8'), 'started\ncancelled\n', 'the run deadline must cancel the target before its completion timer');
+  const log = JSON.parse(await readFile(path.join(runRoot, 'logs', '000000-baseline.json'), 'utf8'));
+  assert.equal(log.execution.aborted, true);
+  assert.equal(log.execution.timedOut, false, 'the shorter run deadline, not the command timeout, must stop execution');
   assert.equal(result.state.status, 'paused');
   assert.match(result.state.stopReason, /time budget/i);
   assert.equal(result.state.baseline.length, 0);
@@ -79,18 +101,17 @@ test('the run deadline interrupts slow baseline execution and saves an unmodifie
 
 test('the run deadline aborts installation before the target can launch', async t => {
   const { base, source, config } = await fixture(t);
-  const installed = path.join(base, 'install-started');
+  const events = path.join(base, 'install-events');
   const launched = path.join(base, 'target-started');
-  const lifecycle = `require('node:fs').writeFileSync(${JSON.stringify(installed)}, 'started'); setTimeout(() => {}, 3000)`;
-  await writeFile(path.join(source, 'package.json'), JSON.stringify({ name: 'case', version: '1.0.0', scripts: { preinstall: `${JSON.stringify(process.execPath)} -e ${JSON.stringify(lifecycle)}` } }));
+  // Test engine cancellation with a real install subprocess without making the
+  // one-second budget depend on npm startup or lifecycle-script scheduling.
+  await controlledNpm(t, base, cancellableProgram(events));
   config.execution.allowInstallScripts = true;
   config.execution.installTimeoutMs = 10000;
   config.command = [process.execPath, '-e', `require('node:fs').writeFileSync(${JSON.stringify(launched)}, 'started'); console.error('TARGET_RANGE_MISMATCH: expected 7, got 8'); process.exit(1)`];
   config.budget.maxSeconds = 1;
-  const started = Date.now();
   const result = await reduceProject({ sourceRoot: source, runRoot: path.join(base, 'install-deadline'), config });
-  assert(Date.now() - started < 2300, 'installation exceeded the remaining run budget');
-  assert.equal(await readFile(installed, 'utf8'), 'started');
+  assert.equal(await readFile(events, 'utf8'), 'started\ncancelled\n', 'the run deadline must cancel installation before its completion timer');
   await assert.rejects(readFile(launched), /ENOENT/);
   assert.equal(result.state.status, 'paused');
   assert.match(result.state.stopReason, /time budget/i);
@@ -99,6 +120,7 @@ test('the run deadline aborts installation before the target can launch', async 
 
 test('a candidate interrupted by the deadline is never accepted and the calibrated snapshot is exportable', async t => {
   const { base, source, config } = await fixture(t);
+  await controlledNpm(t, base);
   const candidateLaunched = path.join(base, 'candidate-started');
   await writeFile(path.join(source, 'check.mjs'), `import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 const fail = () => { console.error('TARGET_RANGE_MISMATCH: expected 7, got 8'); process.exit(1); };
@@ -110,9 +132,8 @@ setTimeout(fail, 3000);
 `);
   config.budget.maxSeconds = 2;
   config.execution.timeoutMs = 10000;
-  const started = Date.now();
-  const result = await reduceProject({ sourceRoot: source, runRoot: path.join(base, 'candidate-deadline'), config });
-  assert(Date.now() - started < 3200, 'candidate used the longer command timeout');
+  const runRoot = path.join(base, 'candidate-deadline');
+  const result = await reduceProject({ sourceRoot: source, runRoot, config });
   assert.equal(await readFile(candidateLaunched, 'utf8'), '2');
   assert.equal(result.state.status, 'verifying');
   assert.match(result.state.stopReason, /time budget/i);
@@ -121,6 +142,10 @@ setTimeout(fail, 3000);
   assert(result.state.trials.every(trial => !trial.accepted));
   assert.equal(result.state.trials.at(-1)!.status, 'invalid');
   assert.equal(result.state.trials.at(-1)!.confirmations, 1);
+  const finalLog = (await readdir(path.join(runRoot, 'logs'))).filter(name => name.endsWith('-candidate.json')).sort().at(-1)!;
+  const observation = JSON.parse(await readFile(path.join(runRoot, 'logs', finalLog), 'utf8'));
+  assert.equal(observation.execution.aborted, true, 'the unfinished confirmation must actually be cancelled');
+  assert.equal(observation.execution.timedOut, false, 'the run deadline must precede the command timeout');
 });
 
 test('an exhausted resume launches neither npm nor a target command', async t => {
@@ -172,8 +197,7 @@ test('the deadline cancels a dependency reconciliation subprocess without accept
   await writeFile(path.join(bin, 'npm'), `#!${process.execPath}
 if (process.argv.includes('--version')) console.log('11.5.1');
 else if (process.argv.includes('--package-lock-only')) {
-  require('node:fs').writeFileSync(${JSON.stringify(marker)}, 'started');
-  setTimeout(() => process.exit(0), 3000);
+  ${cancellableProgram(marker)}
 }
 `, { mode: 0o755 });
   await writeFile(path.join(source, 'package.json'), JSON.stringify({ name: 'case', version: '1.0.0', type: 'module', dependencies: { 'owned-test-placeholder': '1.0.0' } }));
@@ -182,11 +206,9 @@ else if (process.argv.includes('--package-lock-only')) {
   config.reduce = { files: false, syntax: false, json: false, dependencies: true };
   const previousPath = process.env.PATH;
   process.env.PATH = bin + path.delimiter + previousPath;
-  const started = Date.now();
   try {
     const result = await reduceProject({ sourceRoot: source, runRoot: path.join(base, 'reconcile-deadline'), config });
-    assert(Date.now() - started < 2300, 'reconciliation used the longer install timeout');
-    assert.equal(await readFile(marker, 'utf8'), 'started');
+    assert.equal(await readFile(marker, 'utf8'), 'started\ncancelled\n', 'the run deadline must cancel reconciliation before completion');
     assert.equal(result.state.status, 'verifying');
     assert.equal(result.state.originalHash, result.state.bestHash);
     assert.equal(result.state.trials.length, 1);
@@ -206,13 +228,21 @@ test('resume runtime probing respects its remaining deadline before recalibratio
   await saveCheckpoint(root, state, snapshot);
   const bin = path.join(base, 'bin');
   await mkdir(bin);
-  await writeFile(path.join(bin, 'npm'), `#!${process.execPath}\nsetTimeout(() => console.log('11.5.1'), 3000);\n`, { mode: 0o755 });
+  const events = path.join(base, 'runtime-events');
+  await writeFile(path.join(bin, 'npm'), `#!${process.execPath}\n${cancellableProgram(events)}\n`, { mode: 0o755 });
   const previousPath = process.env.PATH;
   process.env.PATH = bin;
-  const started = Date.now();
   try {
-    const result = await resumeProject({ runRoot: root });
-    assert(Date.now() - started < 1700, 'runtime probing ignored the remaining budget');
+    let recalibrated = false;
+    const result = await resumeProject({ runRoot: root, onEvent: event => { if (event.type === 'baseline') recalibrated = true; } });
+    const recorded = await readFile(events, 'utf8').catch((error: NodeJS.ErrnoException) => {
+      if (error.code === 'ENOENT') return '';
+      throw error;
+    });
+    // A 400 ms remainder can expire before Node executes the fixture's first
+    // line. Both pre-launch cancellation and a recorded SIGTERM are valid.
+    assert(['', 'started\ncancelled\n'].includes(recorded), 'remaining run budget must cancel runtime probing before completion');
+    assert.equal(recalibrated, false, 'an expired runtime probe must not reach baseline execution');
     assert.equal(result.state.status, 'paused');
     assert.equal(result.state.bestHash, state.bestHash);
     assert.match(result.state.stopReason, /time budget/i);

@@ -34,8 +34,10 @@ Choose a new output directory for each run. Open `/tmp/rounding-repro/report.htm
 Install the packaged release for your own projects:
 
 ```sh
-npm install --global https://github.com/pavangupta352/repro-surgeon/releases/download/v0.1.0/repro-surgeon-0.1.0.tgz
+npm install --global repro-surgeon@0.1.0
 ```
+
+The same package is available from the [versioned GitHub release](https://github.com/pavangupta352/repro-surgeon/releases/tag/v0.1.0), with a checksum. You can also run `npx repro-surgeon@0.1.0 --help`.
 
 ## Reduce your application
 
@@ -127,6 +129,26 @@ npm workspaces, pnpm/Yarn lockfiles, shrinkwrap, local/Git/private dependencies,
 ## Local execution, plainly
 
 Commands execute with your host permissions. This is **not a security sandbox**. Run trusted source, or put the entire workflow inside your own isolated environment. Install scripts are disabled unless you enable them. Network access is required for uncached dependencies; your command may also use the network. Common credentials, environment files, generated output and symlinks are excluded. Only explicitly requested environment variables are inherited beyond operating-system essentials. [Security policy](SECURITY.md).
+
+## Run the checks
+
+From the repository root:
+
+```sh
+npm ci
+npm run check
+npm run test:package
+```
+
+The native suite does not fetch framework fixture dependencies. Run these optional integrations separately; they download public pinned packages and the Next.js checks take several minutes:
+
+```sh
+node scripts/validate-dependency.mjs /tmp/repro-dependency-validation
+node scripts/validate-pages.mjs /tmp/repro-pages-validation
+node scripts/validate-next.mjs /tmp/repro-framework-validation
+```
+
+Choose new output directories. The scripts check fixed and different-error controls, preserve the original source, and verify the reduced exports. [Measured results and limitations](docs/validation.md).
 
 ## Related work and contributions
 

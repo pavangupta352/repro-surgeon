@@ -70,7 +70,7 @@ All trials have stable content hashes. A checkpoint records config, runtime, bas
 
 The export preserves the source license and notices and places generated metadata under a reserved `.repro/` directory to avoid altering application scripts. The original command still fails as expected. A standalone verifier returns success only when that expected failure matches. It must work without installing Repro Surgeon.
 
-All final source bytes, including generated verification metadata, are copied into a new validation directory before fresh installation and repeated checks. Verification records runtime, package manager, hashes and observations. A clean directory on the same host is described exactly that way; container results are identified separately.
+All final source bytes, including generated verification metadata, are copied into a new validation directory before fresh installation and repeated checks. The checkpoint records the runtime and package manager. Its verification record stores the outcome, completed check count, reason, export snapshot hash and fresh-directory method; individual final command observations are not persisted. A clean directory on the same host is described exactly that way; container results are identified separately.
 
 Review findings include likely secrets, absolute local paths, private package references and retained files. Findings are prompts for inspection, never privacy certification. The CLI never publishes a reproduction. The report is self-contained, escapes every untrusted string, uses no network resources, and labels accepted, rejected and invalid trials in text as well as color.
 

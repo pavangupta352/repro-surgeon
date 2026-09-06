@@ -30,7 +30,15 @@ Three cases were selected from public Next.js reports before reducer tuning. The
 - [Next.js #97927](https://github.com/vercel/next.js/issues/97927): a hyphenated root parameter name, pinned to Next 16.3.3. The check requires both exact TS1005 diagnostics from the generated root-params declaration and failed type checking.
 - [Next.js #96374](https://github.com/vercel/next.js/issues/96374): a byte-order mark before a CSS layer rule, pinned to Next 16.3.0-canary.103. The check requires the CSS parsing diagnostic and the unexpected layer token. This is a historical case; its closed upstream status does not establish a current defect.
 
-All three first datasets reproduced in three baseline builds, reduced while retaining the configured failure, and passed three fresh-directory export checks. Each trigger-removing control built successfully with exit 0; a deliberately unrelated configuration error exited 1 and was rejected by the oracle. Original source hashes remained unchanged. Framework dependency reduction was disabled to measure source reduction at fixed versions. These pinned versions are test inputs, not deployment recommendations.
+The final validation runs on **2026-09-06** used Repro Surgeon **0.1.0**, Node **24.7.0**, npm **11.5.1**, and **macOS ARM64**. All three reconstructed cases reproduced in three baseline builds and passed three fresh-directory export checks. Every accepted change required two matching observations. Each trigger-removing control built successfully with exit 0; a deliberately unrelated configuration error exited 1. Both controls were rejected by the target oracle. Original source hashes remained unchanged.
+
+| Reconstruction | Files | Source bytes | Total snapshot bytes | Candidate evaluations | Search time |
+|---|---:|---:|---:|---:|---:|
+| #98261: named CSS container | 10 → 7 | 2,116 → 195 | 33,310 → 31,389 | 26 | 237.33 s |
+| #97927: hyphenated root parameter | 11 → 6 | 2,794 → 50 | 36,521 → 33,777 | 12 | 256.61 s |
+| #96374: CSS byte-order mark | 10 → 7 | 2,015 → 125 | 33,544 → 31,654 | 26 | 192.00 s |
+
+Search time includes calibration and is rounded here to two decimal places. Reduction plus export verification took 289.801 s, 330.056 s, and 218.977 s respectively, excluding the preceding controls and their dependency setup. The scripts used an 80-evaluation/900-second search budget. Framework dependency reduction was disabled: the direct-dependency counts remained 3, 7, and 3 respectively. These pinned versions are test inputs, not deployment recommendations. [Exact measurements, predicates, controls and hashes](evidence/next-frameworks.json).
 
 Run the reproducible framework validation separately from the native suite:
 
@@ -39,16 +47,44 @@ npm run build
 node scripts/validate-next.mjs /tmp/repro-framework-validation
 ```
 
-Choose a new output path. It installs the pinned packages, checks both controls, runs the reducer and export verifier, and writes `results.json` plus inspectable private logs. Expect minutes and several dependency installations. Source-byte changes exclude lockfiles and generated verification metadata. Successful preservation of an early build diagnostic may leave source that fails later checks for other reasons; the oracle describes exactly the observation tested.
+Choose a new output path. It installs the pinned packages with installation scripts disabled, checks both controls, runs the reducer and export verifier, and writes `results.json` plus inspectable private logs. Expect minutes and several dependency installations. Source bytes include fixture documentation and configuration, but exclude package metadata and generated verification files. Successful preservation of an early build diagnostic may leave source that fails later checks for other reasons; the oracle describes exactly the observation tested. These framework results are fresh-directory checks on the recorded host, not framework container or OS-matrix results.
 
-## Dependency removal
+### Pages Router application failure
 
-An authored fixture installed public `picomatch@4.0.7`, then removed it through the dependency pass. The package disappeared from both the manifest and lock, the direct-dependency count fell from 1 to 0, and total snapshot bytes fell from 1,139 to 625. The accepted candidate had two matching observations; export passed three fresh checks and the standalone verifier exited 0. Fixed and different-failure controls were rejected. Original source was unchanged.
+The [Pages Router fixture](../examples/next-pages) is independently authored with a seeded `getStaticProps` exception. It is **not an upstream Next.js bug**. It pins Next.js **16.3.4** and React/React DOM **19.2.8** and uses the same recorded macOS/Node/npm runtime as the reconstructed cases. The adapter detected `router: pages` without warnings.
+
+| Files | Source bytes | Total snapshot bytes | Candidate evaluations | Search time | Fresh export checks |
+|---:|---:|---:|---:|---:|---:|
+| 8 → 5 | 2,424 → 271 | 33,618 → 31,465 | 24 | 395.90 s | 3 passed |
+
+Three baseline builds matched both the named total-mismatch diagnostic and Next's prerendering-error text for `/`. Six accepted changes each had two matching executions. Removing the throw produced a successful exit-0 build with an SSG Pages route; an unrelated configuration exception exited 1. Both controls were classified absent. The original source hash remained unchanged, and dependency count stayed at 3 because dependency reduction was disabled.
+
+Search stopped at its 24-evaluation limit within the configured 600-second budget. Reduction plus export verification took 451.370 s, excluding controls and their dependency setup. No separate standalone Pages verifier run is claimed. [Exact measurements and controls](evidence/next-pages.json).
 
 ```sh
 npm run build
-node scripts/validate-dependency.mjs
+node scripts/validate-pages.mjs /tmp/repro-pages-validation
 ```
+
+## Dependency removal
+
+An authored fixture installed public **`picomatch@4.0.7`**, checked its local installed package file and runtime import, then removed the unused package through the dependency pass. This ran on Repro Surgeon 0.1.0, Node 24.7.0, npm 11.5.1, macOS ARM64 on 2026-09-06.
+
+| State | Files | Source bytes | Total snapshot bytes | Direct dependencies |
+|---|---:|---:|---:|---:|
+| Input | 4 | 310 | 1,139 | 1 |
+| Accepted source | 4 | 310 | 625 | 0 |
+
+Three baseline observations reproduced, and the dependency proposal was accepted after two matching executions: 2 candidate evaluations total. The manifest declaration, lock root declaration and resolved package entry were removed. The exported metadata was checked against the accepted metadata. Export passed three fresh checks, and its standalone verifier additionally exited 0. The fixed control exited 0; a deliberately different failure exited 1; both were classified absent. Original source was unchanged.
+
+This validates dependency removal; source bytes and file count did not decrease. The measured reduction/export/standalone phase took 2.474 s, excluding fixture generation, lock generation, installation proof and controls. The package was unused by the test command; this single local run does not establish general package-manager or performance coverage. [Exact measurements and controls](evidence/dependency-removal.json).
+
+```sh
+npm run build
+node scripts/validate-dependency.mjs /tmp/repro-dependency-validation
+```
+
+The framework, Pages Router and public-dependency scripts are opt-in checks that may download pinned packages. They are excluded from the native default test command. Use a new output directory for each invocation; full outputs contain private snapshots and logs, while the linked evidence files contain only selected validation data.
 
 ## Independent review and report inspection
 

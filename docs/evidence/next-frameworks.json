@@ -1,0 +1,271 @@
+{
+  "date": "2026-09-06",
+  "kind": "independent-next-report-reconstructions",
+  "runtime": {
+    "node": "v24.7.0",
+    "npm": "11.5.1",
+    "platform": "darwin",
+    "arch": "arm64",
+    "tool": "0.1.0"
+  },
+  "validationScript": "scripts/validate-next.mjs",
+  "provenance": "Independently authored reconstructions of reported triggers; the original reproduction repositories were not copied or executed.",
+  "cases": [
+    {
+      "name": "next-container",
+      "fixture": "examples/next-container",
+      "upstreamIssue": "https://github.com/vercel/next.js/issues/98261",
+      "nextVersion": "16.3.4",
+      "settings": {
+        "command": [
+          "npm",
+          "run",
+          "build"
+        ],
+        "oracle": {
+          "exitCode": 1,
+          "allOf": [
+            "Parsing CSS source code failed",
+            "@container scroll-content",
+            "Unexpected end of input"
+          ],
+          "noneOf": [
+            "Module not found",
+            "Cannot find module",
+            "Failed to fetch"
+          ]
+        },
+        "budget": {
+          "maxEvaluations": 80,
+          "maxSeconds": 900
+        },
+        "runs": {
+          "baseline": 3,
+          "candidate": 2,
+          "final": 3
+        },
+        "allowInstallScripts": false,
+        "reduce": {
+          "files": true,
+          "syntax": true,
+          "json": true,
+          "dependencies": false
+        }
+      },
+      "sourceHash": "779ebdbe72d3ca4e1da159cf28634c761aed3b838d8a81f492ff38d1b06d644f",
+      "sourceUnchanged": true,
+      "initial": {
+        "files": 10,
+        "bytes": 33310,
+        "sourceBytes": 2116,
+        "dependencies": 3
+      },
+      "current": {
+        "files": 7,
+        "bytes": 31389,
+        "sourceBytes": 195,
+        "dependencies": 3
+      },
+      "baseline": [
+        "reproduced",
+        "reproduced",
+        "reproduced"
+      ],
+      "evaluations": 26,
+      "searchMs": 237328.937125,
+      "totalMs": 289801,
+      "verification": {
+        "status": "verified",
+        "runs": 3,
+        "snapshotHash": "edcd4a94f38488bf6864afec1178eb44d1a653ae605875f709f31cc992d0996b",
+        "environment": "fresh-directory"
+      },
+      "controls": [
+        {
+          "kind": "trigger-removed",
+          "exitCode": 0,
+          "status": "absent"
+        },
+        {
+          "kind": "different-failure",
+          "exitCode": 1,
+          "status": "absent"
+        }
+      ]
+    },
+    {
+      "name": "next-root-param",
+      "fixture": "examples/next-root-param",
+      "upstreamIssue": "https://github.com/vercel/next.js/issues/97927",
+      "nextVersion": "16.3.3",
+      "settings": {
+        "command": [
+          "npm",
+          "run",
+          "build"
+        ],
+        "oracle": {
+          "exitCode": 1,
+          "allOf": [
+            ".next/types/root-params.d.ts(4,23): error TS1005: '(' expected.",
+            ".next/types/root-params.d.ts(4,33): error TS1005: ';' expected.",
+            "Failed to type check."
+          ],
+          "noneOf": [
+            "Module not found",
+            "Cannot find module",
+            "Failed to fetch"
+          ]
+        },
+        "budget": {
+          "maxEvaluations": 80,
+          "maxSeconds": 900
+        },
+        "runs": {
+          "baseline": 3,
+          "candidate": 2,
+          "final": 3
+        },
+        "allowInstallScripts": false,
+        "reduce": {
+          "files": true,
+          "syntax": true,
+          "json": true,
+          "dependencies": false
+        }
+      },
+      "sourceHash": "8f71fa4567549db642f9096d43fa67f9ef4c463583c5b373e98daa846cccf5a4",
+      "sourceUnchanged": true,
+      "initial": {
+        "files": 11,
+        "bytes": 36521,
+        "sourceBytes": 2794,
+        "dependencies": 7
+      },
+      "current": {
+        "files": 6,
+        "bytes": 33777,
+        "sourceBytes": 50,
+        "dependencies": 7
+      },
+      "baseline": [
+        "reproduced",
+        "reproduced",
+        "reproduced"
+      ],
+      "evaluations": 12,
+      "searchMs": 256606.08345800004,
+      "totalMs": 330056,
+      "verification": {
+        "status": "verified",
+        "runs": 3,
+        "snapshotHash": "a20b644dd14aa32d50ab79e07ddeb63b77ff805c5b857e592acbf20b24c20c58",
+        "environment": "fresh-directory"
+      },
+      "controls": [
+        {
+          "kind": "trigger-removed",
+          "exitCode": 0,
+          "status": "absent"
+        },
+        {
+          "kind": "different-failure",
+          "exitCode": 1,
+          "status": "absent"
+        }
+      ]
+    },
+    {
+      "name": "next-css-bom",
+      "fixture": "examples/next-css-bom",
+      "upstreamIssue": "https://github.com/vercel/next.js/issues/96374",
+      "nextVersion": "16.3.0-canary.103",
+      "settings": {
+        "command": [
+          "npm",
+          "run",
+          "build"
+        ],
+        "oracle": {
+          "exitCode": 1,
+          "allOf": [
+            "Parsing CSS source code failed",
+            "AtKeyword(\"layer\")"
+          ],
+          "noneOf": [
+            "Module not found",
+            "Cannot find module",
+            "Failed to fetch"
+          ]
+        },
+        "budget": {
+          "maxEvaluations": 80,
+          "maxSeconds": 900
+        },
+        "runs": {
+          "baseline": 3,
+          "candidate": 2,
+          "final": 3
+        },
+        "allowInstallScripts": false,
+        "reduce": {
+          "files": true,
+          "syntax": true,
+          "json": true,
+          "dependencies": false
+        }
+      },
+      "sourceHash": "51de138f74a3518ddf6c4404d6db333c200b4067bb59d20dda480b3ee4c3f5f0",
+      "sourceUnchanged": true,
+      "initial": {
+        "files": 10,
+        "bytes": 33544,
+        "sourceBytes": 2015,
+        "dependencies": 3
+      },
+      "current": {
+        "files": 7,
+        "bytes": 31654,
+        "sourceBytes": 125,
+        "dependencies": 3
+      },
+      "baseline": [
+        "reproduced",
+        "reproduced",
+        "reproduced"
+      ],
+      "evaluations": 26,
+      "searchMs": 191995.6436249999,
+      "totalMs": 218977,
+      "verification": {
+        "status": "verified",
+        "runs": 3,
+        "snapshotHash": "dabfe035b15992d774c667c70d7fc027abc9367fb8acfad41b173133dc424d43",
+        "environment": "fresh-directory"
+      },
+      "controls": [
+        {
+          "kind": "trigger-removed",
+          "exitCode": 0,
+          "status": "absent"
+        },
+        {
+          "kind": "different-failure",
+          "exitCode": 1,
+          "status": "absent"
+        }
+      ]
+    }
+  ],
+  "timingScope": {
+    "searchMs": "Recorded calibration and search elapsed time.",
+    "totalMs": "Reduction plus export verification; excludes preceding controls and their dependency setup."
+  },
+  "limits": [
+    "One macOS ARM64 environment; fresh directories on the same host, not framework container or OS-matrix coverage.",
+    "Dependency reduction disabled at the pinned framework versions.",
+    "Source bytes include fixture documentation and configuration but exclude package metadata and generated verification files.",
+    "Preserving an early diagnostic does not establish later build validity or identical semantic root cause.",
+    "These are local observations, not competitive performance benchmarks or current-version bug claims."
+  ]
+}

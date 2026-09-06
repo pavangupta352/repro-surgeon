@@ -1,0 +1,109 @@
+{
+  "date": "2026-09-06",
+  "kind": "owned-public-dependency-removal",
+  "fixtureGenerator": "scripts/validate-dependency.mjs",
+  "package": "picomatch",
+  "installedVersion": "4.0.7",
+  "runtime": {
+    "node": "v24.7.0",
+    "npm": "11.5.1",
+    "platform": "darwin",
+    "arch": "arm64",
+    "tool": "0.1.0"
+  },
+  "settings": {
+    "command": [
+      "node",
+      "check.cjs"
+    ],
+    "oracle": {
+      "exitCode": 1,
+      "allOf": [
+        "OWNED_DEPENDENCY_TOTAL_MISMATCH: expected 12, got 13"
+      ],
+      "noneOf": [
+        "UNRELATED_DEPENDENCY_FAILURE",
+        "Cannot find module"
+      ]
+    },
+    "budget": {
+      "maxEvaluations": 8,
+      "maxSeconds": 120
+    },
+    "runs": {
+      "baseline": 3,
+      "candidate": 2,
+      "final": 3
+    },
+    "allowInstallScripts": false,
+    "reduce": {
+      "files": false,
+      "syntax": false,
+      "json": false,
+      "dependencies": true
+    }
+  },
+  "sourceHash": "2b68d61aaf59c75ef98252db282721903063db57e668ee6b655cc21831cdbc13",
+  "sourceUnchanged": true,
+  "initial": {
+    "files": 4,
+    "bytes": 1139,
+    "sourceBytes": 310,
+    "dependencies": 1
+  },
+  "current": {
+    "files": 4,
+    "bytes": 625,
+    "sourceBytes": 310,
+    "dependencies": 0
+  },
+  "baseline": [
+    "reproduced",
+    "reproduced",
+    "reproduced"
+  ],
+  "evaluations": 2,
+  "totalMs": 2474,
+  "verification": {
+    "status": "verified",
+    "runs": 3,
+    "snapshotHash": "5849b96b1d4751a2f431a8dc2dcf0dfc4752c3b59460d0abc3f9ec604ed4a2fe",
+    "environment": "fresh-directory"
+  },
+  "controls": [
+    {
+      "kind": "trigger-removed",
+      "exitCode": 0,
+      "status": "absent"
+    },
+    {
+      "kind": "different-failure",
+      "exitCode": 1,
+      "status": "absent"
+    }
+  ],
+  "manifestDependencyRemoved": true,
+  "lockDependencyRemoved": true,
+  "exportedMetadataMatchesAccepted": true,
+  "acceptedChanges": [
+    {
+      "kind": "dependencies",
+      "paths": [
+        "package.json",
+        "package-lock.json"
+      ],
+      "confirmations": 2
+    }
+  ],
+  "standalone": {
+    "exitCode": 0
+  },
+  "timingScope": {
+    "totalMs": "Reduction, export verification and standalone verification; excludes fixture lock generation, installation proof and controls."
+  },
+  "limits": [
+    "The pinned public package was unused by the locally authored failure command.",
+    "Source bytes and file count did not decrease; this validates the dependency pass and exact exported npm metadata.",
+    "One macOS ARM64 environment; not general package-manager, platform or performance coverage."
+  ]
+}

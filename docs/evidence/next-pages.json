@@ -1,0 +1,152 @@
+{
+  "date": "2026-09-06",
+  "kind": "owned-seeded-next-pages-failure",
+  "fixture": "examples/next-pages",
+  "validationScript": "scripts/validate-pages.mjs",
+  "provenance": "Independently authored seeded application failure; no external reproduction source",
+  "runtime": {
+    "node": "v24.7.0",
+    "npm": "11.5.1",
+    "platform": "darwin",
+    "arch": "arm64",
+    "tool": "0.1.0"
+  },
+  "adapter": {
+    "name": "next",
+    "version": "16.3.4",
+    "router": "pages"
+  },
+  "settings": {
+    "command": [
+      "npm",
+      "run",
+      "build"
+    ],
+    "oracle": {
+      "exitCode": 1,
+      "allOf": [
+        "OWNED_PAGES_TOTAL_MISMATCH: expected 12, got 13",
+        "Error occurred prerendering page \"/\""
+      ],
+      "noneOf": [
+        "Module not found",
+        "Cannot find module",
+        "UNRELATED_PAGES_FAILURE",
+        "Failed to fetch"
+      ]
+    },
+    "budget": {
+      "maxEvaluations": 24,
+      "maxSeconds": 600
+    },
+    "runs": {
+      "baseline": 3,
+      "candidate": 2,
+      "final": 3
+    },
+    "allowInstallScripts": false,
+    "reduce": {
+      "files": true,
+      "syntax": true,
+      "json": false,
+      "dependencies": false
+    }
+  },
+  "sourceHash": "fa9695f4025ad1be39c96e5c7a7abad0775dfa93db820378b75943743f277c1b",
+  "sourceUnchanged": true,
+  "initial": {
+    "files": 8,
+    "bytes": 33618,
+    "sourceBytes": 2424,
+    "dependencies": 3
+  },
+  "current": {
+    "files": 5,
+    "bytes": 31465,
+    "sourceBytes": 271,
+    "dependencies": 3
+  },
+  "baseline": [
+    "reproduced",
+    "reproduced",
+    "reproduced"
+  ],
+  "evaluations": 24,
+  "searchMs": 395901.142542,
+  "totalMs": 451370,
+  "verification": {
+    "status": "verified",
+    "runs": 3,
+    "snapshotHash": "5d4207f5df01aad0c69bd3d4929a1764f0e6a4008e660b7da9eb02ea6881665d",
+    "environment": "fresh-directory"
+  },
+  "controls": [
+    {
+      "kind": "trigger-removed",
+      "exitCode": 0,
+      "status": "absent"
+    },
+    {
+      "kind": "different-failure",
+      "exitCode": 1,
+      "status": "absent"
+    }
+  ],
+  "acceptedChanges": [
+    {
+      "kind": "files",
+      "paths": [
+        "README.md",
+        "lib/unused-catalog.js",
+        "repro-surgeon.json"
+      ],
+      "confirmations": 2
+    },
+    {
+      "kind": "syntax",
+      "paths": [
+        "pages/health.jsx"
+      ],
+      "confirmations": 2
+    },
+    {
+      "kind": "syntax",
+      "paths": [
+        "pages/index.jsx"
+      ],
+      "confirmations": 2
+    },
+    {
+      "kind": "syntax",
+      "paths": [
+        "pages/index.jsx"
+      ],
+      "confirmations": 2
+    },
+    {
+      "kind": "syntax",
+      "paths": [
+        "pages/index.jsx"
+      ],
+      "confirmations": 2
+    },
+    {
+      "kind": "syntax",
+      "paths": [
+        "pages/index.jsx"
+      ],
+      "confirmations": 2
+    }
+  ],
+  "timingScope": {
+    "searchMs": "Recorded calibration and search elapsed time.",
+    "totalMs": "Reduction plus export verification; excludes preceding controls and their dependency setup."
+  },
+  "limits": [
+    "Independently authored application exception in getStaticProps; not an upstream Next.js bug.",
+    "One macOS ARM64 environment; three fresh-directory export checks, with no separate standalone Pages verifier run claimed.",
+    "Search stopped at 24 candidate evaluations; dependency reduction was disabled.",
+    "Source-byte reduction includes unused fixture documentation and configuration.",
+    "A local validation result, not a speed or minimality benchmark."
+  ]
+}
