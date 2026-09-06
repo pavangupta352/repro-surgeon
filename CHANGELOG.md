@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.1
+
+- Clarify that reduction edits target copies and configured checks start in temporary directories; arbitrary commands retain filesystem and network access, including access to the original checkout. No built-in sandbox has been added.
+- Include the execution boundary in CLI help, configuration guidance and each newly exported verifier's README. Distinguish npm-version probes and `init` from failure checks.
+- Document running the workflow in Docker with a read-only source mount and separate writable output, including the remaining read, network and output risks.
+- Add execution-boundary regression coverage for temporary command working directories and caller-owned paths outside them.
+
 ## 0.2.0
 
 - Run the bundled rounding demonstration directly from the installed package with `repro-surgeon demo`. It reduces the source, exports a reproduction and verifies it independently.

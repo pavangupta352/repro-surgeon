@@ -1,6 +1,6 @@
 {
   "name": "repro-surgeon",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Shrink a failing application into an independently verified reproduction.",
   "type": "module",
   "bin": { "repro-surgeon": "dist/cli.js" },

@@ -8,9 +8,9 @@
 
 “Can you provide a minimal reproduction?” is often the hardest part of a bug report.
 
-Repro Surgeon takes a failing npm application, removes source that isn't needed for your failure check, and exports a smaller project with its own verifier. It tests every accepted change and checks the export again with a fresh dependency installation. Your original project stays in place.
+Repro Surgeon takes a failing npm application, removes source that isn't needed for your failure check, and exports a smaller project with its own verifier. It tests every accepted change and checks the export again with a fresh dependency installation. The reducer applies its edits to temporary copies, not your source checkout. Supplied commands retain your filesystem permissions; see [the execution boundary](#local-execution-plainly).
 
-No account. No telemetry. Source and reports stay local.
+No account. Repro Surgeon has no telemetry or source-upload service.
 
 [![An actual rounding example reduced from 10 files to 5, with three independent verification runs](https://raw.githubusercontent.com/pavangupta352/repro-surgeon/main/docs/assets/report.png)](https://pavangupta352.github.io/repro-surgeon/)
 
@@ -21,7 +21,7 @@ No account. No telemetry. Source and reports stay local.
 Requires **Node.js 22.18+ and npm 10+**, on Linux or macOS.
 
 ```sh
-npx repro-surgeon@0.2.0 demo --out ./rounding-repro
+npx repro-surgeon@0.2.1 demo --out ./rounding-repro
 node ./rounding-repro/repro/.repro/verify.mjs
 ```
 
@@ -32,10 +32,10 @@ Choose a new output directory for each run. Open `./rounding-repro/report.html` 
 Install the packaged release for your own projects:
 
 ```sh
-npm install --global repro-surgeon@0.2.0
+npm install --global repro-surgeon@0.2.1
 ```
 
-The same package is available from the [versioned GitHub release](https://github.com/pavangupta352/repro-surgeon/releases/tag/v0.2.0), with a checksum. You can also run `npx repro-surgeon@0.2.0 --help`.
+The same package is available from the [versioned GitHub release](https://github.com/pavangupta352/repro-surgeon/releases/tag/v0.2.1), with a checksum. You can also run `npx repro-surgeon@0.2.1 --help`.
 
 ## Reduce your application
 
@@ -126,7 +126,11 @@ npm workspaces, pnpm/Yarn lockfiles, shrinkwrap, local/Git/private dependencies,
 
 ## Local execution, plainly
 
-Commands execute with your host permissions. This is **not a security sandbox**. Run trusted source, or put the entire workflow inside your own isolated environment. Install scripts are disabled unless you enable them. Network access is required for uncached dependencies; your command may also use the network. Common credentials, environment files, generated output and symlinks are excluded. Only explicitly requested environment variables are inherited beyond operating-system essentials. [Security policy](SECURITY.md).
+Every baseline, candidate and verification invocation of your configured command **starts with a temporary project copy as its working directory**. The reducer applies its source edits to those copies. That starting directory is **not a security sandbox**: a command can change directory, use `../` or absolute paths, and read or write any file its process permissions allow, including the original checkout. There is no automatic path rewriting or filesystem confinement. You control and must trust the command and its dependencies.
+
+For an additional boundary, follow the [container recipe with source mounted read-only](docs/execution-container.md). It keeps the original mount unwritable through ordinary filesystem operations and gives the run a separate writable output directory. Read-only source is still readable; containers do not make arbitrary code harmless.
+
+Install scripts are disabled unless you enable them. Network access is required for uncached dependencies; your command may also use the network. Common credentials, environment files, generated output and symlinks are excluded from source snapshots, not hidden from host processes. Configured checks and dependency installations inherit only operating-system essentials plus explicitly requested environment variables. `init` writes the requested configuration file; `doctor` inspects inputs and probes `npm --version` without running your configured command. [Security policy](SECURITY.md).
 
 ## Run the checks
 

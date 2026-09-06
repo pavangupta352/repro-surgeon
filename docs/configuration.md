@@ -31,7 +31,9 @@
 
 ## Command and oracle
 
-`command` is an argv array, run from a disposable copy of the project. There is no implicit shell, so redirection, pipes, globs and shell substitutions are literal arguments. Put a multi-step check in a script and name that script explicitly. Prefer portable executable names such as `node` and `npm`; absolute paths may not work for a recipient.
+`command` is an argv array. Each baseline, candidate and verification invocation starts with a disposable project copy as its working directory. There is no implicit shell, so redirection, pipes, globs and shell substitutions are literal arguments. Put a multi-step check in a script and name that script explicitly. Prefer portable executable names such as `node` and `npm`; absolute paths may not work for a recipient.
+
+The working directory is a starting location, not an access boundary. The command can change it and use `../` or absolute paths with normal process permissions, including writes to the original checkout. Those paths are not automatically rewritten or blocked. The reducer edits its copies; it cannot promise that caller-supplied code leaves host files unchanged. Use trusted commands or the [read-only-source container recipe](execution-container.md). Review external paths and state even when same-host verification passes.
 
 The oracle matches combined stdout/stderr after terminal-control normalization. `exitCode` is an integer from 0 through 255. `allOf` must contain at least one non-empty, case-sensitive literal fragment. Every required fragment must occur, and no `noneOf` fragment may occur. These are literals, not regular expressions. A normal nonmatching exit is `absent`; execution/setup failures are `invalid`.
 
@@ -53,7 +55,7 @@ All limits must be positive safe integers. Baseline and final repetition counts 
 
 `include`, `exclude`, and `preserve` accept project-relative paths, directory prefixes and glob patterns using `/` separators. Ordinary `.gitignore` rules, including nested rules, apply. `include` can override an ignore rule; explicit `exclude` wins. Neither can reintroduce hard-excluded material such as `.env` (including `.env.example`), `.npmrc`, credential keys, `node_modules`, `.git`, `.next`, `dist`, `build`, `.repro` or symbolic links.
 
-`preserve` prevents eligible source from being deleted or rewritten; it does not include a file excluded from the initial inventory. Pinning either `package.json` or `package-lock.json` disables dependency reduction. Package metadata and license/notice files receive default protection from generic reductions.
+`preserve` prevents the reducer from deleting or rewriting eligible source; it does not restrict writes performed by your command or include a file excluded from the initial inventory. Pinning either `package.json` or `package-lock.json` disables dependency reduction. Package metadata and license/notice files receive default protection from generic reductions.
 
 `adapter` is `auto`, `next` or `generic`. Next.js detection records router and entrypoints, protects framework paths conservatively and guides file proposals. Protection of an entrypoint's path does not pin its contents; use `preserve` if its contents must remain unchanged. Heuristics never replace execution checks.
 
@@ -64,7 +66,7 @@ The snapshot limit is 128 MiB of included source. Installed dependencies are exc
 | Command | Purpose |
 |---|---|
 | `init [project] --match TEXT -- COMMAND ARGS` | Write configuration without overwriting an existing file |
-| `doctor [project] [--config FILE] [--json]` | Inventory and runtime/dependency diagnosis; no project code execution |
+| `doctor [project] [--config FILE] [--json]` | Inventory and runtime/dependency diagnosis; does not run the configured failure command |
 | `reduce [project] --out DIRECTORY [--config FILE]` | Start a new run outside the source tree |
 | `resume DIRECTORY [--max-evaluations N] [--max-seconds N]` | Continue an accepted checkpoint with total-budget overrides |
 | `verify EXPORTED_DIRECTORY [--json]` | Independently check the exported source |

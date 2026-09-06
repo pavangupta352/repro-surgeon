@@ -11,7 +11,7 @@ The default release targets deterministic command and Next.js build failures on 
 ## Lifecycle
 
 1. `init` writes a versioned JSON configuration from an explicit command and target text. It never guesses the user's failure silently.
-2. `doctor` inventories a project, identifies its adapter, and reports unsupported dependencies or environmental requirements without executing project code.
+2. `doctor` inventories a project, identifies its adapter, and reports unsupported dependencies or environmental requirements without running the configured failure command.
 3. `reduce` snapshots the input into a new run directory, provisions dependencies, and calibrates three uncached baseline runs.
 4. Hierarchical file reductions and syntax/data transformations are evaluated in disposable working directories. Two uncached confirmations are required before a candidate becomes the accepted state.
 5. Each decision is checkpointed atomically. `resume` validates the saved state and runtime, recalibrates the accepted snapshot, and continues with the remaining or explicitly expanded budget.
@@ -46,17 +46,17 @@ Required positive fragments cannot be empty. Broad phrases such as “failed” 
 
 Baseline and final checks require three runs; acceptance requires two. Repetition is not a statistical guarantee of determinism. A failed calibration stops the run. Candidate caches skip previously rejected snapshots; they never supply confirmation or final verification.
 
-Commands are argv arrays and use no implicit shell. The working directory, temporary home, installation configuration and build outputs are owned by the run. The environment inherits only operating-system essentials plus explicitly named variables. Logs are bounded and private to the run; report data contains summaries, not raw source/log dumps. Terminal control sequences are removed from displayed excerpts.
+Configured commands are argv arrays and use no implicit shell. Each baseline, candidate and verification invocation starts in a temporary project copy. Dependency installations also use temporary workspaces. The tool provisions the initial working directory, temporary home and installation configuration; arbitrary commands can write outside them. For these checks and installations, the environment inherits only operating-system essentials plus explicitly named variables. Logs are bounded and private to the run; report data contains summaries, not raw source/log dumps. Terminal control sequences are removed from displayed excerpts.
 
-Local execution is not a security sandbox. Only run projects and commands you trust. npm installation scripts are disabled by default and can be enabled explicitly when required. Network access is needed for uncached packages and may also be used by the supplied command. Repro Surgeon has no telemetry or source-upload service.
+Local execution is not a security sandbox. The command may change directory, use `../` or absolute paths and access the original checkout or other files with its process permissions. Paths are not rewritten or confined. Only run projects and commands you trust, or provide an external boundary such as the [documented container with read-only source](execution-container.md). npm installation scripts are disabled by default and can be enabled explicitly when required. Network access is needed for uncached packages and may also be used by the supplied command. Repro Surgeon has no telemetry or source-upload service.
 
 ## Source and dependency integrity
 
-The original project is read into an immutable snapshot. Git history, installed dependencies, generated output, environment files and known credential files are excluded. Ordinary untracked files are included; ignore rules and explicit overrides are visible in the inventory. Symlinks are rejected or excluded without following them. Export and state paths must not overlap the source. No command executes inside the original project.
+The original project is read into an immutable snapshot. The reducer applies source transformations to copies, not the original checkout. Git history, installed dependencies, generated output, environment files and known credential files are excluded from snapshots; these exclusions do not restrict a running command's host access. Ordinary untracked files are included; ignore rules and explicit overrides are visible in the inventory. Symlinks are rejected or excluded without following them. Export and state paths must not overlap the source. `init` writes its requested configuration file. `doctor` does not run the configured failure command. npm-version probes may use the source directory and caller environment; this is separate from the temporary cwd and environment used for failure checks.
 
 Package manifests, lockfiles, licenses and notices are protected from generic file deletion. The package manager owns dependency reconciliation. Source candidates share only a tool-provisioned dependency installation for the same manifest/lock hash; they never link to the user's `node_modules`. Each candidate restores accepted source and clears build artifacts. Dependency changes use a new installation and cannot resolve removed dependencies from a stale tree. Retained package versions and integrity fields must not drift during lock reconciliation.
 
-Projects with workspace, local file/link dependencies or private registry requirements are diagnosed explicitly. A portable export cannot quietly depend on the original checkout or developer credentials. Required environment variable names are reported; values are not copied into exported configuration.
+Projects with workspace, local file/link dependencies or private registry requirements are diagnosed explicitly. These checks reject unsupported dependency declarations; they cannot rule out reads from absolute host paths, credentials or other external state in arbitrary code. Review such dependencies and verify in another environment before claiming portability. Required environment variable names are reported; values are not copied into exported configuration.
 
 ## Search
 
@@ -78,7 +78,7 @@ Review findings include likely secrets, absolute local paths, private package re
 
 - Each CLI command has meaningful success and failure-path coverage.
 - Oracle controls reject a different error, timeout, signal and missing executable.
-- Source hashes remain unchanged after success, failure and cancellation.
+- Trusted regression fixtures retain their source hashes after success, failure and cancellation. Separate execution-boundary tests show that caller-supplied code can access host paths outside its initial temporary working directory.
 - File grouping, JavaScript/TypeScript/JSX, JSON, dependency integrity, checkpoint corruption, resume and export have executed regression cases.
 - Packaged installation runs the complete example and independent exported verifier.
 - Pinned App Router and Pages Router examples run through the real Next.js build command.

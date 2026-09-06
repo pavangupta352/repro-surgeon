@@ -38,7 +38,8 @@ Options
 
 Single-package npm projects · Node 22.18+ · Linux/macOS
 Demo uses the bundled rounding example and saves a timestamped run in the current directory.
-Commands execute locally with your permissions. Review remaining source before sharing.
+Failure checks start in temporary copies with your permissions, not a security sandbox.
+Commands can still access host paths. Review source and commands before running or sharing.
 `;
 
 export function createRunReport(state: RunState, snapshot: Snapshot): RunReport {

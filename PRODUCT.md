@@ -42,7 +42,7 @@ The bundled rounding demonstration and independently written reconstructions of 
 
 - The exported runnable project is the primary deliverable.
 - Execute every acceptance check; never substitute a heuristic for evidence.
-- Preserve the source project and make every accepted change inspectable.
+- Apply reducer edits to copies and make every accepted change inspectable; state that supplied commands retain host access.
 - Keep state and reports local, and make remaining uncertainty explicit.
 - Optimize for another developer successfully reproducing the failure.
 

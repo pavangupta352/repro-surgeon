@@ -42,7 +42,7 @@
       <noscript><p class="noscript">The walkthrough needs JavaScript. The <a href="report.html">complete recorded report</a> and <a href="rounding-repro.tar.gz">verified source download</a> remain available.</p></noscript>
     </section>
     <section class="try-it" aria-labelledby="try-title">
-      <div><h2 id="try-title">Run it yourself</h2><p>One command runs the real example, reduction, and fresh verification. Requires Node 22.18+ and npm 10+ on Linux or macOS.</p></div>
+      <div><h2 id="try-title">Run it yourself</h2><p>One command runs the real example, reduction, and fresh verification. Requires Node 22.18+ and npm 10+ on Linux or macOS.</p><p>Checks start in temporary copies with your process permissions. They can still access other files. <a href="https://github.com/pavangupta352/repro-surgeon/blob/main/SECURITY.md#execution-boundary">Execution boundary and container setup</a>.</p></div>
       <div class="command-group"><div class="command"><code id="demo-command">npx repro-surgeon demo --out ./rounding-repro</code><button id="copy" type="button" disabled>Copy command</button></div><p id="copy-status" role="status">Choose a new output directory. Open its report.html when the command finishes.</p></div>
     </section>
     <section class="take-away" aria-labelledby="export-title">
