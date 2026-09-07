@@ -4,11 +4,11 @@ Repro Surgeon's command name describes a workflow, not a permission boundary. A 
 
 ## Optional HOL Guard support
 
-[HOL Guard](https://github.com/hashgraph-online/hol-guard) supports optional command safety extensions. Repro Surgeon's proposed integration is tracked in [HOL Guard #2826](https://github.com/hashgraph-online/hol-guard/issues/2826).
+[HOL Guard](https://github.com/hashgraph-online/hol-guard) supports optional command safety extensions. The integration proposal is tracked in [HOL Guard #2826](https://github.com/hashgraph-online/hol-guard/issues/2826), with the implementation and validation in [draft PR #2829](https://github.com/hashgraph-online/hol-guard/pull/2829).
 
 The proposed `command.repro-surgeon` extension reviews installed `repro-surgeon` invocations of `reduce`, `resume`, `verify` and `demo` before they execute. It is opt-in and contributes command evidence to Guard's existing policy. Repro Surgeon itself does not require Guard, Python, an account or an additional approval prompt.
 
-**Availability:** this integration is a contribution under review, not a feature promised in an existing Guard release. Check the linked upstream change and its release status before relying on this coverage. Installing Repro Surgeon does not install, enable or configure Guard.
+**Availability:** the implementation is submitted as a draft PR for upstream review. It is not included in a released Guard version yet. Check the linked upstream change and its release status before relying on this coverage. Installing Repro Surgeon does not install, enable or configure Guard.
 
 ## Command effects
 
