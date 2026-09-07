@@ -16,6 +16,8 @@ node dist/cli.js --help
 
 Tests use Node's test runner with native TypeScript stripping. Type checking and the published JavaScript build use the pinned TypeScript compiler. Unit and subprocess tests do not need a registry dependency installation; the slower framework validation installs pinned packages separately.
 
+For saved evidence that becomes stale after relevant edits, use `npm run verify:dev`, then `npm run verify:status`. Add `-- --checks typecheck,test,build,package` when packaging or execution changes need the installed CLI check. The [development verification guide](docs/development-verification.md) explains scope, local logs and limitations. This optional workflow checks Repro Surgeon's development scripts; it does not require a target application's tests to pass.
+
 ## Make a change
 
 Keep a pull request focused on an observable behavior. Add a regression that demonstrates a correctness bug before the fix, then run `npm run check`. For a new reduction, show both a preserved failure and a candidate that must be rejected. For execution changes, include cancellation, invalid setup, and process cleanup where relevant. For exported output, test the standalone verifier without this package installed.
