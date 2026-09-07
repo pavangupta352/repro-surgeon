@@ -132,6 +132,8 @@ For an additional boundary, follow the [container recipe with source mounted rea
 
 Install scripts are disabled unless you enable them. Network access is required for uncached dependencies; your command may also use the network. Common credentials, environment files, generated output and symlinks are excluded from source snapshots, not hidden from host processes. Configured checks and dependency installations inherit only operating-system essentials plus explicitly requested environment variables. `init` writes the requested configuration file; `doctor` inspects inputs and probes `npm --version` without running your configured command. [Security policy](SECURITY.md).
 
+Integrating a command review tool? The [command-effects reference and optional HOL Guard proposal](docs/command-review.md) describe which commands execute project code, parser edge cases and the limits of pre-execution review.
+
 ## Run the checks
 
 To develop from source:
